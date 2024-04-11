@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+
 function Extract() {
   const [eleves, setEleves] = useState([]);
   const [student, setStudent] = useState([]);
 
+  const [loading, setLoading] = useState(false);
   
   useEffect(() => {
     axios
@@ -29,9 +31,12 @@ function Extract() {
     });
   }
 
- 
+
+
   const handleImageUpload = (event) => {
     try {
+      setLoading(true); // Activer le chargement
+  
       const formData = new FormData();
       formData.append('file', event.target.files[0]);
   
@@ -41,23 +46,27 @@ function Extract() {
         }
       })
       .then(response => {
-        handleReadAll()
-        setStudent(response.data)
-
+        handleReadAll();
+        setStudent(response.data);
       })
       .catch(error => {
         // Gérer les erreurs ici
         console.error('Erreur lors du téléchargement de l\'image:', error);
+      })
+      .finally(() => {
+        setLoading(false); // Désactiver le chargement une fois la requête terminée
       }); 
     } catch (error) {
       console.error('Erreur lors du téléchargement de l\'image:', error);
     }
   };
   
+  
   if(!eleves.length)
        {
           return(
             <div className="container">
+               {loading && <div className="alert alert-info" role="alert">Chargement en cours...</div>}
                <div className="mt-3">
                <input 
                   className="form-control" 
@@ -77,7 +86,8 @@ function Extract() {
   else{
 
     return (
-      <div className="container">
+      <div className="contenu">
+         {loading && <div className="alert alert-info" role="alert">Chargement en cours...</div>}
         {/* Header */}
         {/* Body */}
         <div className="mt-3">
@@ -107,6 +117,7 @@ function Extract() {
                 <th scope="col">Scolarité</th>
                 <th scope="col">N° Reçu</th>
                 <th scope="col">Date</th>
+                <th scope="col">Paiement</th>
                 <th scope="col">Actions</th>
               </tr>
             </thead>
@@ -122,6 +133,7 @@ function Extract() {
               <td>{person.scolarite}</td>
               <td>{person.numeroDuRecu}</td>
               <td>{person.date}</td>
+              <td>{person.modePaiement}</td>
               <td>  
                 <button className="btn btn-warning btn-sm m-1">Modifier</button>
                 <button className="btn btn-danger btn-sm m-1">Supprimer</button>
